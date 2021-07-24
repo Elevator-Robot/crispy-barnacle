@@ -12,6 +12,14 @@ import { Stream } from "stream";
 
 ffmpeg.setFfmpegPath(ffmpeg_path);
 
+/**
+ *
+ * @param { string } bucket AWS Destination S3 Bucket Name
+ * @param { string } key    AWS Destination S3 Object Key
+ * @param { string } tags   AWS Object Tags
+ * @param { string } deps   Dependancy Object
+ * @returns { Stream.PassThrough } passthrough
+ */
 export const uploadFromStream = (
   bucket: string,
   key: string,
@@ -27,26 +35,25 @@ export const uploadFromStream = (
 };
 
 /**
- * Core handler
+ * Core transcoder handler function
  * @param { event } event Incoming S3 event
  */
 export const handler = (event: event) => {
   const input_bucket = "string"; // @TODO: pull input_bucket from event
-  let _bucket = "bucket_name"; // @TODO:;
-  let key,
-    _key = "keyname"; // @TODO: pull key from event, replace input extension with output extension
-  let _tags = "string"; // @TODO: build tagstring from input object tags
-  let _deps = {
+  const _bucket = "bucket_name"; // @TODO:;
+  const key = "keyname"; // @TODO: pull key from event
+  const _key = key; // @TODO: replace input extension with output extension
+  const _tags = "string"; // @TODO: build tagstring from input object tags
+  const _deps = {
     s3: new S3(),
   };
   const input_url = `https://${input_bucket}.s3.amazonaws.com/${key}`;
   const writestream = uploadFromStream(_bucket, _key, _tags, _deps);
 
-  ffmpeg("test_input.wav") // @TODO: replace with S3 URL built from https://input_bucket/stuff.region.aws.com/key
+  ffmpeg(input_url) // @TODO: replace with S3 URL built from ex https://input_bucket/stuff.region.aws.com/key
     .noVideo()
     .audioBitrate(128)
     .audioCodec("libvorbis")
-    .output("test_ouput.ogg")
     .on("error", (err) => {
       console.log("An error occurred: " + err.message);
     })
@@ -55,4 +62,6 @@ export const handler = (event: event) => {
     })
     .pipe(writestream);
 };
-handler(dummyEvent);
+
+// Uncomment to fire locally with a simulated event.
+// handler(dummyEvent);
