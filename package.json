@@ -1,0 +1,46 @@
+{
+  "name": "aws-media-transcoder-lambda",
+  "version": "1.0.0",
+  "description": "A lambda function to transcode media files in memory and place them in storage",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "start": "npm-run-all clean --parallel watch:build watch:server --print-label",
+    "watch:build": "tsc --watch",
+    "watch:server": "nodemon './dist/index.js' --watch './dist'",
+    "docs": "typedoc",
+    "test": "node ./dist/transcoder.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnweland/crispy-barnacle.git"
+  },
+  "keywords": [
+    "aws",
+    "lambda",
+    "media",
+    "transcoder",
+    "s3"
+  ],
+  "author": "John Weland <john.weland@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnweland/crispy-barnacle/issues"
+  },
+  "homepage": "https://github.com/johnweland/crispy-barnacle#readme",
+  "dependencies": {
+    "aws-sdk": "^2.953.0",
+    "ffmpeg-static": "^4.4.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/ffmpeg-static": "^3.0.0",
+    "@types/fluent-ffmpeg": "^2.1.18",
+    "@types/node": "^10.17.60",
+    "nodemon": "^2.0.12",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "typedoc": "^0.21.4"
+  }
+}

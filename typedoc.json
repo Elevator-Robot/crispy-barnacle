@@ -1,0 +1,4 @@
+{
+    "entryPoints": ["transcoder.ts"],
+    "out": "docs"
+}
