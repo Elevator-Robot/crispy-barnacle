@@ -20,10 +20,10 @@ export class CdkStack extends Stack {
       bundling: {
         minify: true,
         sourceMap: true,
-        target: Runtime.NODEJS_14_X.toString(),
+        target: "node12.19.0",
       },
       handler: "handler",
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_12_X,
     };
 
     const escalateCaseLambda = new NodejsFunction(
