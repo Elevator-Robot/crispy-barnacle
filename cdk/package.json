@@ -21,7 +21,12 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-iam": "^1.116.0",
+    "@aws-cdk/aws-lambda": "^1.116.0",
+    "@aws-cdk/aws-lambda-nodejs": "^1.116.0",
     "@aws-cdk/aws-s3": "^1.116.0",
+    "@aws-cdk/aws-stepfunctions": "^1.116.0",
+    "@aws-cdk/aws-stepfunctions-tasks": "^1.116.0",
     "@aws-cdk/core": "1.116.0",
     "source-map-support": "^0.5.16"
   }

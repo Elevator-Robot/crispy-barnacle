@@ -1,9 +1,90 @@
-import * as cdk from '@aws-cdk/core';
+import * as path from "path";
+import { Runtime } from "@aws-cdk/aws-lambda";
+import { NodejsFunction } from "@aws-cdk/aws-lambda-nodejs";
+import {
+  Chain,
+  Choice,
+  Condition,
+  Fail,
+  StateMachine,
+} from "@aws-cdk/aws-stepfunctions";
+import { LambdaInvoke } from "@aws-cdk/aws-stepfunctions-tasks";
+import { Construct, Stack, StackProps, CfnOutput } from "@aws-cdk/core";
 
-export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+const lambdapath = path.resolve(__dirname, "../../", "lambdas");
+
+export class CdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+    const lambdaProps = {
+      bundling: {
+        minify: true,
+        sourceMap: true,
+        target: Runtime.NODEJS_14_X.toString(),
+      },
+      handler: "handler",
+      runtime: Runtime.NODEJS_14_X,
+    };
 
-    // The code that defines your stack goes here
+    const escalateCaseLambda = new NodejsFunction(
+      this,
+      "escalateCaseFunction",
+      {
+        ...lambdaProps,
+        entry: `${lambdapath}/error.ts`,
+      }
+    );
+
+    const validate = new NodejsFunction(this, "validationFunction", {
+      ...lambdaProps,
+      entry: `${lambdapath}/validator.ts`,
+    });
+
+    const transcode = new NodejsFunction(this, "transcoderFunction", {
+      ...lambdaProps,
+      entry: `${lambdapath}/transcoder.ts`,
+    });
+
+    const cleanup = new NodejsFunction(this, "cleanupFunction", {
+      ...lambdaProps,
+      entry: `${lambdapath}/cleanup.ts`,
+    });
+
+    const validateFile = new LambdaInvoke(this, "Validate File", {
+      lambdaFunction: validate,
+    });
+
+    const transcodeFile = new LambdaInvoke(this, "Transcode File", {
+      lambdaFunction: transcode,
+    });
+
+    const cleanupFile = new LambdaInvoke(this, "Cleanup File", {
+      lambdaFunction: cleanup,
+    });
+
+    const escalateCase = new LambdaInvoke(this, "Escalate Case", {
+      lambdaFunction: escalateCaseLambda,
+    });
+
+    const jobFailed = new Fail(this, "Fail", {
+      cause: "Engage Tier 2 Support",
+    });
+
+    const isComplete = new Choice(this, "Is Case Resolved");
+
+    const chain = Chain.start(validateFile)
+      .next(transcodeFile)
+      .next(
+        isComplete
+          .when(Condition.numberEquals("$.Status", 1), cleanupFile)
+          .when(
+            Condition.numberEquals("$.Status", 0),
+            escalateCase.next(jobFailed)
+          )
+      );
+
+    new StateMachine(this, "StateMachine", {
+      definition: chain,
+    });
   }
 }
