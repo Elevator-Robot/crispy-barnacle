@@ -1,5 +1,3 @@
-import { String } from "aws-sdk/clients/batch";
-
 export type event = {
   Records: [
     {
@@ -33,3 +31,9 @@ export const dummyEvent = {
     },
   ],
 };
+
+export interface IStep {
+  message: string;
+  status?: number;
+  event: event;
+}
