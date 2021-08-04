@@ -9,7 +9,9 @@
     "watch:build": "tsc --watch",
     "watch:server": "nodemon './dist/index.js' --watch './dist'",
     "docs": "typedoc",
-    "test": "node ./dist/transcoder.js"
+    "test:validate": "node ./dist/validator.js",
+    "test:transcode": "node ./dist/transcoder.js",
+    "test:cleanup": "node ./dist/cleanup.js"
   },
   "repository": {
     "type": "git",
