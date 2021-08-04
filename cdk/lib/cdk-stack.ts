@@ -11,7 +11,7 @@ import {
 import { LambdaInvoke } from "@aws-cdk/aws-stepfunctions-tasks";
 import { Construct, Stack, StackProps, CfnOutput } from "@aws-cdk/core";
 
-const lambdapath = path.resolve(__dirname, "../../", "lambdas");
+const lambdapath = path.resolve(__dirname, "lambdas");
 
 export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
